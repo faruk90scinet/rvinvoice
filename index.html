@@ -1,4 +1,4 @@
-<!doctype html> 
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -7,6 +7,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#096f3d">
 <meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&display=swap">
@@ -481,7 +482,7 @@ function b64(buf){let s="";const b=new Uint8Array(buf);for(let i=0;i<b.length;i+
 function unb64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 /* ---------- Dropbox connection (OAuth with PKCE, app folder) ---------- */
 /* Paste your Dropbox App key between the quotes, or enter it on the setup screen. */
-const DROPBOX_APP_KEY="";
+const DROPBOX_APP_KEY="ittkq9of60zye56";
 const DBX_PATH="/rightvenue-invoices-data.json";
 const LS={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}},del(k){try{localStorage.removeItem(k)}catch{}}};
 const DBX={
@@ -517,26 +518,26 @@ const DBX={
     const t=this.tok();if(!t)throw new Error("notconnected");
     if(!force&&t.access&&Date.now()<t.exp)return t.access;
     const r=await fetch("https://api.dropboxapi.com/oauth2/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"refresh_token",refresh_token:t.refresh,client_id:this.appKey()})});
-    if(!r.ok){if(r.status===400||r.status===401){this.disconnect();throw new Error("notconnected")}throw new Error("offline")}
+    if(!r.ok){if(r.status===400||r.status===401){this.disconnect();throw new Error("notconnected")}const x=new Error("offline");x.detail="Dropbox login refresh failed ("+r.status+")";throw x}
     const j=await r.json();t.access=j.access_token;t.exp=Date.now()+(j.expires_in||14400)*1000-60000;this.saveTok(t);return t.access;
   },
   async call(url,opts,retry=true){
     let res;
     try{const a=await this.access();res=await fetch(url,{...opts,headers:{...(opts.headers||{}),Authorization:"Bearer "+a}})}
-    catch(e){if(e.message==="notconnected")throw e;throw new Error("offline")}
+    catch(e){if(e.message==="notconnected")throw e;const x=new Error("offline");x.detail="Network error: "+(e.message||e);throw x}
     if(res.status===401&&retry){await this.access(true);return this.call(url,opts,false)}
     return res;
   },
   async meta(){
     const r=await this.call("https://api.dropboxapi.com/2/files/get_metadata",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({path:DBX_PATH})});
     if(r.status===409)return null;
-    if(!r.ok)throw new Error("dbx"+r.status);
+    if(!r.ok)throw await dbxErr(r);
     return r.json();
   },
   async download(){
     const r=await this.call("https://content.dropboxapi.com/2/files/download",{method:"POST",headers:{"Dropbox-API-Arg":JSON.stringify({path:DBX_PATH})}});
     if(r.status===409)return null;
-    if(!r.ok)throw new Error("dbx"+r.status);
+    if(!r.ok)throw await dbxErr(r);
     let rev="";try{rev=JSON.parse(r.headers.get("Dropbox-API-Result")||"{}").rev||""}catch{}
     return {text:await r.text(),rev};
   },
@@ -544,11 +545,18 @@ const DBX={
     const mode=rev?{".tag":"update",update:rev}:{".tag":"add"};
     const r=await this.call("https://content.dropboxapi.com/2/files/upload",{method:"POST",headers:{"Content-Type":"application/octet-stream","Dropbox-API-Arg":JSON.stringify({path:DBX_PATH,mode,autorename:false,mute:true})},body:text});
     if(r.status===409){const e=new Error("conflict");throw e}
-    if(!r.ok)throw new Error("dbx"+r.status);
+    if(!r.ok)throw await dbxErr(r);
     return (await r.json()).rev;
   },
   disconnect(){LS.del("rv_dbx_tok")}
 };
+async function dbxErr(r){
+  let t="";try{t=await r.text()}catch{}
+  let j=null;try{j=JSON.parse(t)}catch{}
+  const sum=(j&&(j.error_summary||j.error_description||(typeof j.error==="string"?j.error:"")))||t.slice(0,140);
+  const e=new Error("dbx"+r.status);e.detail=`Dropbox said (${r.status}): ${sum||"no details"}`;
+  e.scope=/missing_scope|required_scope/.test(t);e.status=r.status;return e;
+}
 function b64url(buf){return b64(buf).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 
 const ITER=310000;
@@ -689,8 +697,13 @@ async function dropboxStart(){
   try{const m=await DBX.meta();if(m)showUnlock();else showDbxSetup()}
   catch(e){
     if(e.message==="notconnected"){showWelcome("Dropbox needs to be connected again.");return}
-    gate(`<h1>Can't reach Dropbox</h1><p class="g-p">Check your internet connection, then try again.</p><button class="btn primary g-big" id="gRetry">Try again</button><button class="btn ghost" id="gDisc">Disconnect Dropbox</button>`);
-    $("#gRetry").onclick=dropboxStart;$("#gDisc").onclick=()=>{DBX.disconnect();showWelcome()};
+    const scope=e.scope||e.status===401;
+    gate(scope?`<h1>Dropbox permissions needed</h1><p class="g-p">Your Dropbox app is missing a permission. In the Dropbox developer site, open your app's <b>Permissions</b> tab, tick <b>files.metadata.read</b>, <b>files.content.read</b> and <b>files.content.write</b>, click <b>Submit</b>, then connect again here.</p><button class="btn primary g-big" id="gRe">Connect Dropbox again</button>`
+      :`<h1>Can't reach Dropbox</h1><p class="g-p">${e.message==="offline"?"Check your internet connection, then try again.":"Dropbox refused the request."}</p>`)
+    $("#gate .gate-card").insertAdjacentHTML("beforeend",`${e.detail?`<div class="steps-box" style="word-break:break-word"><b>Details</b><div style="margin-top:4px;color:var(--muted)">${esc(e.detail)}</div></div>`:""}${scope?"":`<button class="btn primary g-big" id="gRetry">Try again</button>`}<button class="btn ghost" id="gDisc">Disconnect and connect again</button>`);
+    $("#gRetry")?.addEventListener("click",dropboxStart);
+    $("#gRe")?.addEventListener("click",()=>{DBX.disconnect();DBX.begin()});
+    $("#gDisc").onclick=()=>{DBX.disconnect();showWelcome()};
   }
 }
 function showDbxSetup(){
@@ -787,7 +800,7 @@ function showUnlock(fresh){
       await kvSet("cache",text);await kvSet("mode",K.mode);
       enterApp(fresh);
     }catch(err){unbusy(btn);
-      gateErr(err.message==="badpw"?"Wrong password. Try again.":err.message==="notconnected"?"Dropbox needs to be connected again.":err.message==="offline"||String(err.message).startsWith("dbx")?"Couldn't reach Dropbox. Check your internet and try again.":err.message==="conflict"?"A data file already exists in your Dropbox.":err.message==="notours"?"That file isn't a rightVenue data file.":err.name==="NotFoundError"?"The data file wasn't found. It may have been moved or renamed in Dropbox. Use a different data file.":"Couldn't open the data file. Check that Dropbox is running.");
+      gateErr(err.message==="badpw"?"Wrong password. Try again.":err.message==="notconnected"?"Dropbox needs to be connected again.":err.message==="offline"||String(err.message).startsWith("dbx")?("Couldn't reach Dropbox. "+(err.detail||"Check your internet and try again.")):err.message==="conflict"?"A data file already exists in your Dropbox.":err.message==="notours"?"That file isn't a rightVenue data file.":err.name==="NotFoundError"?"The data file wasn't found. It may have been moved or renamed in Dropbox. Use a different data file.":"Couldn't open the data file. Check that Dropbox is running.");
       $("#gPw").select();}
   });
 }
@@ -802,6 +815,17 @@ function lockApp(){
   K.key=null;loadObj({});S.inv=null;S.dirty=false;closeModal();
   history.replaceState(null,"","#dashboard");showUnlock();
 }
+/* auto-lock after 15 minutes without use */
+const IDLE_MS=15*60*1000;let lastActive=Date.now();
+["pointerdown","keydown","touchstart","wheel"].forEach(ev=>document.addEventListener(ev,()=>{lastActive=Date.now()},{passive:true,capture:true}));
+function idleCheck(){
+  if(!K.key||Date.now()-lastActive<IDLE_MS)return;
+  if(S.saveState==="pending"||saving){setTimeout(idleCheck,1500);return}
+  if(S.view==="editor"&&S.invIsNew&&S.dirty&&S.inv?.buyer?.name?.trim()){saveNew().then(()=>{if(!S.invIsNew)setTimeout(idleCheck,1500)});return}
+  S.dirty=false;S.invIsNew=false;lockApp();toast("Locked after 15 minutes without use");
+}
+setInterval(idleCheck,30000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")idleCheck()});
 async function changePassword(){
   openModal(`<div class="modal-h"><h2>Change password</h2><button class="btn ghost icon" data-close aria-label="Close">${icon("x")}</button></div>
   <form id="pwForm"><div class="modal-b">
