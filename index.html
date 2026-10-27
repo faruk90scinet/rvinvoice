@@ -212,6 +212,9 @@ textarea.inp{height:auto;min-height:70px;padding:9px 11px;resize:vertical;line-h
 .pv-page{position:relative;width:100%;overflow:hidden;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.12),0 8px 24px rgba(0,0,0,.08)}
 .pv-page>.paper{position:absolute;left:0;top:0;transform-origin:0 0}
 .mob-tabs{display:none}
+.editor[data-preview="off"]{grid-template-columns:minmax(0,780px)}
+.editor[data-preview="off"] .preview-col{display:none!important}
+#btnPv[aria-pressed="false"]{color:var(--muted)}
 .menu{position:relative}
 .menu-pop{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:6px;min-width:200px;z-index:20;display:flex;flex-direction:column}
 .menu-pop button{display:flex;gap:9px;align-items:center;text-align:left;border:0;background:none;padding:9px 10px;border-radius:7px;cursor:pointer;font-weight:600}
@@ -304,6 +307,7 @@ textarea.inp{height:auto;min-height:70px;padding:9px 11px;resize:vertical;line-h
   .mob-tabs{display:flex;margin-bottom:12px}
   .editor[data-tab="form"] .preview-col{display:none}
   .editor[data-tab="preview"] .form-col{display:none}
+  .editor[data-preview="off"] .form-col{display:block!important}
 }
 @media (max-width:980px){
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -358,6 +362,8 @@ textarea.inp{height:auto;min-height:70px;padding:9px 11px;resize:vertical;line-h
   <symbol id="i-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
   <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 3l5 3.2L7 9.4 2 6.2zM17 3l5 3.2-5 3.2-5-3.2zM2 12.6l5-3.2 5 3.2-5 3.2zM12 12.6l5-3.2 5 3.2-5 3.2zM7 17l5 3.2 5-3.2"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3 3.9M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18"/></symbol>
   <symbol id="i-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
 </svg>
 
@@ -460,7 +466,7 @@ const DEFAULTS={
   emailBody:"Dear {buyer},\n\nPlease find attached invoice {number} for {amount}, due on {due}.\n\nYou can pay securely with Payoneer here:\n{link}\n\nThank you for working with rightVenue.\n\nBest regards,\nrightVenue\ninfo@rightvenuebd.com | www.rightvenuebd.com",
   counters:{}
 };
-const S={live:false,loaded:false,db:null,mcp:null,dl:null,base:null,
+const S={preview:(()=>{try{return localStorage.getItem("rv_preview")!=="off"}catch{return true}})(),live:false,loaded:false,db:null,mcp:null,dl:null,base:null,
   settings:{...DEFAULTS},invoices:[],buyers:[],
   view:"dashboard",inv:null,invIsNew:false,dirty:false,tab:"form",filter:"all",q:"",bq:""};
 const $=(s,r=document)=>r.querySelector(s);
@@ -1078,15 +1084,16 @@ function viewEditor(){
   const inv=S.inv;
   return `${offlineBanner()}
   <div class="ed-bar" id="edBar"></div>
-  <div class="seg mob-tabs" role="tablist"><button data-tab="form" aria-pressed="${S.tab==="form"}">Edit</button><button data-tab="preview" aria-pressed="${S.tab==="preview"}">Preview</button></div>
-  <div class="editor" data-tab="${S.tab}">
+  <div class="seg mob-tabs" role="tablist" ${S.preview?"":"hidden"}><button data-tab="form" aria-pressed="${S.tab==="form"}">Edit</button><button data-tab="preview" aria-pressed="${S.tab==="preview"}">Preview</button></div>
+  <div class="editor" data-tab="${S.tab}" data-preview="${S.preview?"on":"off"}">
     <div class="form-col card" id="edForm">
       <div class="sec">
-        <div class="sec-h"><h3>Bill to</h3><button type="button" class="add-link" id="saveBuyerBtn">${icon("plus")}Save as buyer</button></div>
+        <div class="sec-h"><h3>Bill to</h3></div>
         <label class="f"><span>Saved buyer</span><select class="inp" id="e_buyer"><option value="">— Type details below or choose —</option>${[...S.buyers].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(b=>`<option value="${b.id}" ${inv.buyerId===b.id?"selected":""}>${esc(b.name)}${b.company?" · "+esc(b.company):""}</option>`).join("")}</select></label>
         <div class="grid2"><label class="f"><span>Name</span><input class="inp" id="e_bname" value="${esc(inv.buyer.name)}"></label><label class="f"><span>Company</span><input class="inp" id="e_bco" value="${esc(inv.buyer.company)}"></label></div>
         <div class="grid2"><label class="f"><span>Email</span><input class="inp" id="e_bemail" type="email" value="${esc(inv.buyer.email)}"></label><label class="f"><span>Country</span><input class="inp" id="e_bcountry" value="${esc(inv.buyer.country)}"></label></div>
         <label class="f"><span>Address</span><textarea class="inp" id="e_baddr" rows="2" style="min-height:56px">${esc(inv.buyer.address)}</textarea></label>
+        <div class="row"><button type="button" class="btn" id="saveBuyerBtn"></button><span class="hint" id="buyerHint"></span></div>
       </div>
       <div class="sec">
         <div class="sec-h"><h3>Details</h3><div class="seg" role="group" aria-label="Currency"><button type="button" data-cur="USD" aria-pressed="${inv.currency==="USD"}">USD $</button><button type="button" data-cur="BDT" aria-pressed="${inv.currency==="BDT"}">BDT ৳</button></div></div>
@@ -1122,6 +1129,7 @@ function renderEditorBar(){
   bar.innerHTML=`<div class="title"><a href="#invoices" class="btn ghost icon" aria-label="Back to invoices">${icon("back")}</a><h1>${esc(previewNumber(inv))}</h1>${S.invIsNew?`<span class="pill draft">New</span>`:pill(st)}<span class="save-state" id="saveState">${S.invIsNew?"Not saved yet":S.dirty?"Saving…":"All changes saved"}</span></div>
   <div class="row">
     ${S.invIsNew?`<button class="btn primary" id="btnSave">${icon("check")}Save invoice</button>`:""}
+    <button class="btn" id="btnPv" aria-pressed="${S.preview}" title="Show or hide the invoice preview">${icon(S.preview?"eye":"eye-off")}Preview ${S.preview?"on":"off"}</button>
     <button class="btn" id="btnPdf">${icon("dl")}PDF</button>
     <button class="btn ${S.invIsNew?"":"primary"}" id="btnEmail">${icon("mail")}Email</button>
     ${!S.invIsNew&&st!=="paid"?`<button class="btn" id="btnPaid">${icon("check")}Mark paid</button>`:""}
@@ -1134,6 +1142,7 @@ function renderEditorBar(){
   </div>`;
   $("#btnSave")?.addEventListener("click",saveNew);
   $("#btnPdf")?.addEventListener("click",downloadPdf);
+  $("#btnPv")?.addEventListener("click",togglePreview);
   $("#btnEmail").addEventListener("click",emailModal);
   $("#btnPaid")?.addEventListener("click",()=>setStatus("paid"));
   const pop=$("#morePop");
@@ -1153,11 +1162,11 @@ function bindEditor(){
   const inv=S.inv;
   const on=(id,fn,ev="input")=>$("#"+id).addEventListener(ev,fn);
   const bf={e_bname:"name",e_bco:"company",e_bemail:"email",e_bcountry:"country",e_baddr:"address"};
-  Object.entries(bf).forEach(([id,k])=>on(id,e=>{inv.buyer[k]=e.target.value;changed()}));
+  Object.entries(bf).forEach(([id,k])=>on(id,e=>{inv.buyer[k]=e.target.value;updateBuyerBtn();changed()}));
   on("e_buyer",e=>{const b=S.buyers.find(x=>x.id===e.target.value);inv.buyerId=b?.id||"";
     if(b){inv.buyer={name:b.name||"",company:b.company||"",email:b.email||"",country:b.country||"",address:b.address||""};
       $("#e_bname").value=inv.buyer.name;$("#e_bco").value=inv.buyer.company;$("#e_bemail").value=inv.buyer.email;$("#e_bcountry").value=inv.buyer.country;$("#e_baddr").value=inv.buyer.address}
-    changed()},"change");
+    updateBuyerBtn();changed()},"change");
   on("e_issue",e=>{inv.issueDate=e.target.value;if(S.invIsNew)renderEditorBar();changed()});
   on("e_due",e=>{inv.dueDate=e.target.value;changed()});
   on("e_sc",e=>{inv.serviceChargePct=e.target.value===""?0:Number(e.target.value);renderMini();changed()});
@@ -1167,14 +1176,23 @@ function bindEditor(){
   document.querySelectorAll(".mob-tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>{S.tab=b.dataset.tab;document.querySelectorAll(".mob-tabs [data-tab]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));$(".editor").dataset.tab=S.tab;if(S.tab==="preview")updatePreview()}));
   on("addItem",()=>{inv.items.push({desc:"",qty:1,rate:""});renderItems();changed();const all=document.querySelectorAll("#itemsBox textarea");all[all.length-1]?.focus()},"click");
   on("addDed",()=>{inv.deductions.push({label:"Discount",amount:""});renderDeds();changed();const all=document.querySelectorAll("#dedBox .ded-amt");all[all.length-1]?.focus()},"click");
+  updateBuyerBtn();
   on("saveBuyerBtn",async()=>{
     const b=inv.buyer;if(!b.name.trim()){toast("Enter the buyer's name first",true);$("#e_bname").focus();return}
     const existing=inv.buyerId&&S.buyers.find(x=>x.id===inv.buyerId);
     const nb={id:existing?existing.id:uid("buy"),name:b.name.trim(),company:b.company.trim(),email:b.email.trim(),country:b.country.trim(),address:b.address.trim()};
     try{await putBuyer(nb);inv.buyerId=nb.id;changed();toast(existing?"Buyer updated":"Buyer saved");
-      const sel=$("#e_buyer");if(sel&&!existing){const o=document.createElement("option");o.value=nb.id;o.textContent=nb.name+(nb.company?" · "+nb.company:"");sel.append(o)}if(sel)sel.value=nb.id}
+      const sel=$("#e_buyer");if(sel&&!existing){const o=document.createElement("option");o.value=nb.id;o.textContent=nb.name+(nb.company?" · "+nb.company:"");sel.append(o)}if(sel)sel.value=nb.id;updateBuyerBtn()}
     catch{toast("Couldn't save the buyer",true)}
   },"click");
+}
+function updateBuyerBtn(){
+  const btn=$("#saveBuyerBtn"),hint=$("#buyerHint");if(!btn||!S.inv)return;
+  const b=S.inv.buyer,ex=S.inv.buyerId&&S.buyers.find(x=>x.id===S.inv.buyerId);
+  const same=ex&&["name","company","email","country","address"].every(k=>(ex[k]||"").trim()===(b[k]||"").trim());
+  if(!ex){btn.innerHTML=`${icon("users")}Save buyer`;btn.disabled=false;hint.textContent="Keep these details for future invoices";}
+  else if(same){btn.innerHTML=`${icon("check")}Buyer saved`;btn.disabled=true;hint.textContent="";}
+  else{btn.innerHTML=`${icon("users")}Update saved buyer`;btn.disabled=false;hint.textContent="You changed this buyer's details";}
 }
 function renderItems(){
   const inv=S.inv,box=$("#itemsBox");if(!box)return;
@@ -1296,8 +1314,15 @@ function buildPages(inv,host){
   pages.forEach((p,i)=>p.querySelector(".pg").textContent=`Page ${i+1} of ${pages.length}`);
   return pages;
 }
+function togglePreview(){
+  S.preview=!S.preview;try{localStorage.setItem("rv_preview",S.preview?"on":"off")}catch{}
+  const ed=$(".editor");if(ed){ed.dataset.preview=S.preview?"on":"off";if(!S.preview){S.tab="form";ed.dataset.tab="form";document.querySelectorAll(".mob-tabs [data-tab]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.tab==="form")))}}
+  const mt=$(".mob-tabs");if(mt)mt.hidden=!S.preview;
+  renderEditorBar();if(S.preview)updatePreview();
+  toast(S.preview?"Preview on":"Preview off");
+}
 function updatePreview(){
-  if(S.view!=="editor"||!S.inv)return;
+  if(S.view!=="editor"||!S.inv||!S.preview)return;
   const box=$("#pvPages");if(!box)return;
   const host=$("#exportHost");
   const pages=buildPages(S.inv,host);
