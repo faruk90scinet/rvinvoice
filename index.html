@@ -285,52 +285,63 @@ textarea.inp{height:auto;min-height:70px;padding:9px 11px;resize:vertical;line-h
 #exportHost{position:fixed;left:-12000px;top:0;width:794px;pointer-events:none}
 
 /* ---------- invoice paper (always a printed document: fixed light ink on white pad) ---------- */
-.paper{width:794px;height:1123px;position:relative;background:#ffffff;color:#231f20;font-family:"Figtree",Arial,sans-serif;font-size:12.5px;line-height:1.45;overflow:hidden}
+.paper{--fs:12px;--cell:6px;--gap:12px;--qr:84px;width:794px;height:1123px;position:relative;background:#ffffff;color:#231f20;font-family:"Figtree",Arial,sans-serif;font-size:var(--fs);line-height:1.4;overflow:hidden}
+.paper.d1{--fs:11.5px;--cell:5px;--gap:10px;--qr:78px}
+.paper.d2{--fs:11px;--cell:4px;--gap:9px;--qr:72px}
+.paper.d3{--fs:10.5px;--cell:3px;--gap:7px;--qr:66px}
 .paper .pad{position:absolute;inset:0;width:794px;height:1123px;max-width:none}
-.paper .zone{position:absolute;left:52px;right:52px;top:192px;height:690px;overflow:hidden;display:flex;flex-direction:column;gap:16px}
-.paper .pfoot{position:absolute;left:52px;right:52px;top:888px;display:flex;justify-content:space-between;font-size:9.5px;color:#7a7576}
-.p-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
-.p-title{font-family:"Bricolage Grotesque","Figtree",Arial,sans-serif;font-size:34px;font-weight:800;line-height:1;color:#231f20}
-.p-title-bar{display:flex;margin-top:8px;height:4px;width:120px}
+.paper .hcover{position:absolute;left:0;right:0;top:0;height:184px;background:#ffffff}
+.paper .hslice{position:absolute;top:0;overflow:hidden}
+.paper .hslice img{position:absolute;left:0;top:0;max-width:none}
+.paper .zone{position:absolute;left:52px;right:52px;top:188px;height:752px;overflow:hidden;display:flex;flex-direction:column;gap:var(--gap)}
+.paper .pfoot{position:absolute;left:52px;right:52px;top:944px;display:flex;justify-content:space-between;font-size:8.5px;color:#7a7576}
+.p-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.p-title{font-family:"Bricolage Grotesque","Figtree",Arial,sans-serif;font-size:30px;font-weight:800;line-height:1;color:#231f20}
+.paper.d2 .p-title,.paper.d3 .p-title{font-size:26px}
+.p-title-bar{display:flex;margin:6px 0 8px;height:3px;width:110px}
 .p-title-bar i{flex:1}
-.p-meta{display:grid;grid-template-columns:auto auto;column-gap:16px;row-gap:3px;font-size:12px}
+.p-meta{display:grid;grid-template-columns:auto auto;column-gap:14px;row-gap:2px;margin:0;font-size:calc(var(--fs) - .5px)}
 .p-meta dt{color:#7a7576}
-.p-meta dd{margin:0;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.p-meta dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.p-meta.r{padding-top:2px}
+.p-meta.r dd{text-align:right}
+.p-meta.l{justify-content:start}
+.p-meta.l dd{font-size:calc(var(--fs) + .5px)}
 .p-parties{display:flex;justify-content:space-between;gap:24px;align-items:stretch}
 .p-bill{flex:1;min-width:0}
-.p-lbl{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#096f3d;margin-bottom:4px}
-.p-bill .nm{font-size:15px;font-weight:800}
+.p-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#096f3d;margin-bottom:2px}
+.p-bill .nm{font-size:calc(var(--fs) + 2.5px);font-weight:800;line-height:1.25}
 .p-bill .ln{color:#4a4546;white-space:pre-wrap;overflow-wrap:anywhere}
-.p-due{width:230px;flex:none;background:#f6f7f4;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;justify-content:center;position:relative}
-.p-due .amt{font-family:"Bricolage Grotesque","Figtree",Arial,sans-serif;font-size:26px;font-weight:800;color:#096f3d;line-height:1.1;font-variant-numeric:tabular-nums}
-.p-due .by{font-size:11.5px;color:#4a4546;margin-top:2px}
-.p-stamp{position:absolute;right:10px;top:-14px;transform:rotate(-8deg);border:2.5px solid #096f3d;color:#096f3d;font-weight:900;font-size:15px;letter-spacing:.12em;padding:2px 10px;border-radius:6px;background:#ffffff}
-.p-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.p-tbl th{background:#231f20;color:#ffffff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:8px 10px;text-align:left}
+.p-due{width:220px;flex:none;background:#f6f7f4;border-radius:8px;padding:9px 13px;display:flex;flex-direction:column;justify-content:center;position:relative}
+.p-due .amt{font-family:"Bricolage Grotesque","Figtree",Arial,sans-serif;font-size:23px;font-weight:800;color:#096f3d;line-height:1.1;font-variant-numeric:tabular-nums}
+.p-due .by{font-size:10.5px;color:#4a4546;margin-top:1px}
+.p-stamp{position:absolute;right:10px;top:-12px;transform:rotate(-8deg);border:2.5px solid #096f3d;color:#096f3d;font-weight:900;font-size:14px;letter-spacing:.12em;padding:1px 9px;border-radius:6px;background:#ffffff}
+.p-tbl{width:100%;border-collapse:collapse;font-size:var(--fs)}
+.p-tbl th{background:#231f20;color:#ffffff;font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:6px 9px;text-align:left}
 .p-tbl th.r,.p-tbl td.r{text-align:right}
-.p-tbl td{padding:8px 10px;border-bottom:1px solid #e4e4e0;vertical-align:top;font-variant-numeric:tabular-nums}
+.p-tbl td{padding:var(--cell) 9px;border-bottom:1px solid #e4e4e0;vertical-align:top;font-variant-numeric:tabular-nums}
 .p-tbl td.d{white-space:pre-wrap;overflow-wrap:anywhere}
 .p-tbl tr.alt td{background:#fafaf8}
-.p-tbl .ix{color:#7a7576;width:28px}
+.p-tbl .ix{color:#7a7576;width:24px}
 .p-tbl thead tr.goldline th{padding:0;height:3px;background:#f4bb24}
 .p-sum{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}
-.p-words{flex:1;min-width:0;padding-top:4px}
+.p-words{flex:1;min-width:0;padding-top:3px}
 .p-words .t{font-style:italic;color:#231f20;font-weight:600}
-.p-totals{width:270px;flex:none;font-size:12.5px}
-.p-totals div{display:flex;justify-content:space-between;padding:5px 10px;font-variant-numeric:tabular-nums}
+.p-totals{width:260px;flex:none}
+.p-totals div{display:flex;justify-content:space-between;padding:3px 10px;font-variant-numeric:tabular-nums}
 .p-totals .neg{color:#c72027}
-.p-totals .tot{background:#096f3d;color:#ffffff;font-weight:800;font-size:15px;border-radius:6px;margin-top:4px;padding:9px 10px}
-.p-pay{display:flex;justify-content:space-between;gap:18px;align-items:center;border:1px solid #e4e4e0;border-radius:10px;padding:14px 16px;border-left:4px solid #f4bb24}
+.p-totals .tot{background:#096f3d;color:#ffffff;font-weight:800;font-size:calc(var(--fs) + 2px);border-radius:6px;margin-top:3px;padding:7px 10px}
+.p-pay{display:flex;justify-content:space-between;gap:16px;align-items:center;border:1px solid #e4e4e0;border-radius:10px;padding:10px 14px;border-left:4px solid #f4bb24}
 .p-pay .txt{flex:1;min-width:0}
-.p-pay .h{font-weight:800;font-size:13.5px}
-.p-pay .s{color:#4a4546;font-size:11.5px;margin:2px 0 9px}
-.p-paybtn{display:inline-block;background:#096f3d;color:#ffffff;font-weight:800;font-size:12.5px;padding:8px 16px;border-radius:6px;text-decoration:none}
-.p-link{font-size:9.5px;color:#7a7576;margin-top:6px;word-break:break-all}
-.p-qr{flex:none;display:flex;flex-direction:column;align-items:center;gap:4px}
-.p-qr img{width:92px;height:92px;display:block;image-rendering:pixelated}
-.p-qr span{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#231f20}
-.p-notes .t{white-space:pre-wrap;color:#4a4546;overflow-wrap:anywhere}
-.p-cont{font-size:11px;color:#7a7576;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.p-pay .h{font-weight:800;font-size:calc(var(--fs) + 1px)}
+.p-pay .s{color:#4a4546;font-size:calc(var(--fs) - 1px);margin:1px 0 7px}
+.p-paybtn{display:inline-block;background:#096f3d;color:#ffffff;font-weight:800;font-size:var(--fs);padding:6px 14px;border-radius:6px;text-decoration:none}
+.p-link{font-size:8.5px;color:#7a7576;margin-top:5px;word-break:break-all}
+.p-qr{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px}
+.p-qr img{width:var(--qr);height:var(--qr);display:block;image-rendering:pixelated}
+.p-qr span{font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#231f20}
+.p-notes .t{white-space:pre-wrap;color:#4a4546;overflow-wrap:anywhere;font-size:calc(var(--fs) - .5px)}
+.p-cont{font-size:10px;color:#7a7576;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 
 @media (max-width:1180px){
   .editor{grid-template-columns:minmax(0,1fr)}
@@ -1152,7 +1163,7 @@ function viewBusiness(){
       <label class="f"><span>Default note on invoices</span><textarea class="inp" id="s_notes" rows="3">${esc(s.notes)}</textarea></label>
       <div class="hint">Invoice numbers run RV/YEAR/MONTH/101, 102… and start again at 101 each month.</div>
     </div>
-    <div class="sec"><div class="sec-h"><h3>Email</h3><span class="pill ${GMAIL.cid()?"paid":"draft"}">${GMAIL.cid()?"Gmail connected":"Gmail not set up"}</span></div>
+    <div class="sec"><div class="sec-h"><h3>Email</h3><span class="pill ${GMAIL.cid()?"sent":"draft"}">${GMAIL.cid()?"Client ID saved":"Gmail not set up"}</span></div>
       <div class="grid2">
         <label class="f"><span>Your Gmail address (invoices are sent from it)</span><input class="inp" id="s_me" type="email" value="${esc(s.myEmail||"")}"></label>
         <div class="f"><span>Copy</span><label class="tick" style="height:38px"><input type="checkbox" id="s_cc" ${s.ccMe!==false?"checked":""}> Send me a copy (CC)</label></div>
@@ -1161,7 +1172,7 @@ function viewBusiness(){
       <label class="f"><span>Message</span><textarea class="inp" id="s_body" rows="9">${esc(s.emailBody)}</textarea></label>
       <div class="hint">Placeholders: {buyer} {number} {amount} {due} {link}. They're filled in when you email an invoice.</div>
       <label class="f"><span>Signature (added under every invoice email)</span><textarea class="inp" id="s_sig" rows="4">${esc(s.emailSignature||"")}</textarea></label>
-      <div class="row"><button type="button" class="btn" id="bzGmail">${icon("mail")}${GMAIL.cid()?"Change Gmail connection":"Set up Gmail sending"}</button>${GMAIL.valid()?`<button type="button" class="btn ghost" id="bzGout">Sign out of Gmail on this device</button>`:""}</div>
+      <div class="row"><button type="button" class="btn" id="bzGmail">${icon("mail")}${GMAIL.cid()?"Change Gmail Client ID":"Set up Gmail sending"}</button>${GMAIL.valid()?`<button type="button" class="btn ghost" id="bzGout">Sign out of Gmail on this device</button>`:""}</div>
     </div>
     <div class="sec" style="flex-direction:row;justify-content:flex-end"><button class="btn primary" type="submit">${icon("check")}Save details</button></div>
   </form>
@@ -1437,44 +1448,62 @@ function duplicate(){
 function qrDataUrl(text){
   try{if(!window.qrcode||!text)return "";const q=qrcode(0,"M");q.addData(text);q.make();return q.createDataURL(6,0)}catch{return ""}
 }
-function paperShell(){
-  const p=document.createElement("div");p.className="paper";
-  p.innerHTML=`<img class="pad" src="${PAD}" alt=""><div class="zone"></div><div class="pfoot"><span class="pg"></span><span>This is a computer-generated invoice and requires no signature.</span></div>`;
+/* header heights in paper pixels (794 x 1123 sheet) */
+const PAD_HEAD=182, ZONE_BOTTOM=940;
+const DENSITY=[{cls:"",head:1},{cls:"d1",head:1},{cls:"d2",head:1},{cls:"d3",head:1},{cls:"d3",head:.88},{cls:"d3",head:.78}];
+function paperShell(level){
+  const L=DENSITY[level]||DENSITY[0];
+  const p=document.createElement("div");p.className="paper"+(L.cls?" "+L.cls:"");
+  let head="";
+  if(L.head<1){const w=794*L.head,h=PAD_HEAD*L.head;
+    head=`<div class="hcover"></div><div class="hslice" style="left:${(794-w)/2}px;width:${w}px;height:${h}px"><img src="${PAD}" alt="" style="width:${w}px;height:${1123*L.head}px"></div>`}
+  const top=Math.round(PAD_HEAD*L.head)+6;
+  p.innerHTML=`<img class="pad" src="${PAD}" alt="">${head}<div class="zone" style="top:${top}px;height:${ZONE_BOTTOM-top}px"></div><div class="pfoot"><span class="pg"></span><span>This is a computer-generated invoice and requires no signature.</span></div>`;
   return p;
 }
-function buildPages(inv,host){
-  host.innerHTML="";
-  const c=calc(inv),cur=inv.currency,number=previewNumber(inv),st=effStatus(inv,todayISO());
-  const pages=[];
-  const newPage=cont=>{const p=paperShell();host.append(p);pages.push(p);const z=p.querySelector(".zone");if(cont){const h=document.createElement("div");h.className="p-cont";h.textContent=`Invoice ${number}, continued`;z.append(h)}return z};
-  const over=z=>z.scrollHeight>z.clientHeight+1;
-  const el=html=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild};
-  let zone=newPage(false);
-  const b=inv.buyer||{};
-  zone.append(el(`<div class="p-head"><div><div class="p-title">INVOICE</div><div class="p-title-bar"><i style="background:#ec1d25"></i><i style="background:#f4bb24"></i><i style="background:#096f3d"></i></div></div>
-    <dl class="p-meta"><dt>Invoice No.</dt><dd>${esc(number)}</dd><dt>Issue date</dt><dd>${fmtDate(inv.issueDate)}</dd><dt>Due date</dt><dd>${fmtDate(inv.dueDate)}</dd>${fmtMonth(inv.billingMonth)?`<dt>Billing month</dt><dd>${fmtMonth(inv.billingMonth)}</dd>`:""}<dt>Currency</dt><dd>${cur==="BDT"?"BDT (৳)":"USD ($)"}</dd></dl></div>`));
-  zone.append(el(`<div class="p-parties"><div class="p-bill"><div class="p-lbl">Billed to</div><div class="nm">${esc(b.name||"Buyer name")}</div>${b.company?`<div class="ln">${esc(b.company)}</div>`:""}${b.address?`<div class="ln">${esc(b.address)}</div>`:""}${b.country?`<div class="ln">${esc(b.country)}</div>`:""}${b.email?`<div class="ln">${esc(b.email)}</div>`:""}</div>
-    <div class="p-due">${st==="paid"?`<div class="p-stamp">PAID</div>`:""}<div class="p-lbl">${st==="paid"?"Amount paid":"Amount due"}</div><div class="amt">${fmtMoney(c.total,cur)}</div><div class="by">${st==="paid"?`Paid on ${fmtDate(inv.paidDate)}`:`Due by ${fmtDate(inv.dueDate)}`}</div></div></div>`));
+function invoiceBlocks(inv){
+  const c=calc(inv),cur=inv.currency,number=previewNumber(inv),st=effStatus(inv,todayISO()),b=inv.buyer||{};
+  const bm=fmtMonth(inv.billingMonth);
+  const top=`<div class="p-top"><div><div class="p-title">INVOICE</div><div class="p-title-bar"><i style="background:#ec1d25"></i><i style="background:#f4bb24"></i><i style="background:#096f3d"></i></div>
+      <dl class="p-meta l"><dt>Invoice No.</dt><dd>${esc(number)}</dd>${bm?`<dt>Billing month</dt><dd>${bm}</dd>`:""}</dl></div>
+    <dl class="p-meta r"><dt>Issue date</dt><dd>${fmtDate(inv.issueDate)}</dd><dt>Due date</dt><dd>${fmtDate(inv.dueDate)}</dd><dt>Currency</dt><dd>${cur==="BDT"?"BDT (৳)":"USD ($)"}</dd></dl></div>`;
+  const parties=`<div class="p-parties"><div class="p-bill"><div class="p-lbl">Billed to</div><div class="nm">${esc(b.name||"Buyer name")}</div>${b.company?`<div class="ln">${esc(b.company)}</div>`:""}${b.address?`<div class="ln">${esc(b.address)}</div>`:""}${b.country?`<div class="ln">${esc(b.country)}</div>`:""}</div>
+    <div class="p-due">${st==="paid"?`<div class="p-stamp">PAID</div>`:""}<div class="p-lbl">${st==="paid"?"Amount paid":"Amount due"}</div><div class="amt">${fmtMoney(c.total,cur)}</div><div class="by">${st==="paid"?`Paid on ${fmtDate(inv.paidDate)}`:`Due by ${fmtDate(inv.dueDate)}`}</div></div></div>`;
   const tableHead=`<table class="p-tbl"><thead><tr><th class="ix">#</th><th>Description</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr><tr class="goldline"><th colspan="5"></th></tr></thead><tbody></tbody></table>`;
-  let tbl=el(tableHead);zone.append(tbl);
   const items=(inv.items||[]).filter(it=>String(it.desc).trim()||Number(it.rate));
-  const rows=items.length?items:[{desc:"Describe the work here",qty:1,rate:0,_ph:true}];
-  rows.forEach((it,i)=>{
-    const tr=el(`<table><tbody><tr class="${i%2?"alt":""}"><td class="ix">${i+1}</td><td class="d" ${it._ph?'style="color:#9a9596"':""}>${esc(it.desc)}</td><td class="r">${esc(Number(it.qty)||0)}</td><td class="r">${fmtMoney(it.rate,cur)}</td><td class="r"><b>${fmtMoney(r2((Number(it.qty)||0)*(Number(it.rate)||0)),cur)}</b></td></tr></tbody></table>`).querySelector("tr");
-    tbl.tBodies[0].append(tr);
-    if(over(zone)&&tbl.tBodies[0].rows.length>1){tr.remove();zone=newPage(true);tbl=el(tableHead);zone.append(tbl);tbl.tBodies[0].append(tr)}
-  });
-  const blocks=[];
-  blocks.push(`<div class="p-sum"><div class="p-words"><div class="p-lbl">Amount in words</div><div class="t">${esc(amountInWords(c.total,cur))}</div></div>
+  const rows=(items.length?items:[{desc:"Describe the work here",qty:1,rate:0,_ph:true}]).map((it,i)=>`<tr class="${i%2?"alt":""}"><td class="ix">${i+1}</td><td class="d" ${it._ph?'style="color:#9a9596"':""}>${esc(it.desc)}</td><td class="r">${esc(Number(it.qty)||0)}</td><td class="r">${fmtMoney(it.rate,cur)}</td><td class="r"><b>${fmtMoney(r2((Number(it.qty)||0)*(Number(it.rate)||0)),cur)}</b></td></tr>`);
+  const after=[];
+  after.push(`<div class="p-sum"><div class="p-words"><div class="p-lbl">Amount in words</div><div class="t">${esc(amountInWords(c.total,cur))}</div></div>
     <div class="p-totals"><div><span>Subtotal</span><span>${fmtMoney(c.subtotal,cur)}</span></div>
     ${c.pct?`<div><span>Service charge (${c.pct}%)</span><span>+ ${fmtMoney(c.service,cur)}</span></div>`:""}
     ${c.deductions.map(d=>`<div class="neg"><span>${esc(d.label)}</span><span>− ${fmtMoney(d.amount,cur)}</span></div>`).join("")}
     <div class="tot"><span>${st==="paid"?"Total paid":"Total due"}</span><span>${fmtMoney(c.total,cur)}</span></div></div></div>`);
   const link=inv.payoneerLink;
   if(link&&st!=="paid"){const qr=qrDataUrl(link);
-    blocks.push(`<div class="p-pay"><div class="txt"><div class="h">Pay securely with Payoneer</div><div class="s">Click the button or scan the code with your phone. Cards and bank transfers accepted through Payoneer.</div><a class="p-paybtn" data-paylink href="${esc(link)}">Pay ${fmtMoney(c.total,cur)} now</a><div class="p-link">${esc(link)}</div></div>${qr?`<div class="p-qr" data-paylink><img src="${qr}" alt=""><span>Scan to pay</span></div>`:""}</div>`)}
-  if(String(inv.notes||"").trim())blocks.push(`<div class="p-notes"><div class="p-lbl">Note</div><div class="t">${esc(inv.notes)}</div></div>`);
-  for(const h of blocks){const n=el(h);zone.append(n);if(over(zone)){n.remove();zone=newPage(true);zone.append(n)}}
+    after.push(`<div class="p-pay"><div class="txt"><div class="h">Pay securely with Payoneer</div><div class="s">Click the button or scan the code with your phone. Cards and bank transfers accepted through Payoneer.</div><a class="p-paybtn" data-paylink href="${esc(link)}">Pay ${fmtMoney(c.total,cur)} now</a><div class="p-link">${esc(link)}</div></div>${qr?`<div class="p-qr" data-paylink><img src="${qr}" alt=""><span>Scan to pay</span></div>`:""}</div>`)}
+  if(String(inv.notes||"").trim())after.push(`<div class="p-notes"><div class="p-lbl">Note</div><div class="t">${esc(inv.notes)}</div></div>`);
+  return {number,top,parties,tableHead,rows,after};
+}
+function buildPages(inv,host){
+  const B=invoiceBlocks(inv);
+  const el=html=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild};
+  const over=z=>z.scrollHeight>z.clientHeight+1;
+  /* 1) try to fit everything on one page, tightening step by step */
+  for(let lv=0;lv<DENSITY.length;lv++){
+    host.innerHTML="";const p=paperShell(lv);host.append(p);const z=p.querySelector(".zone");
+    z.append(el(B.top),el(B.parties));const tbl=el(B.tableHead);z.append(tbl);
+    tbl.tBodies[0].innerHTML=B.rows.join("");
+    B.after.forEach(h=>z.append(el(h)));
+    if(!over(z)){p.querySelector(".pg").textContent="";return [p]}
+  }
+  /* 2) too long for one page: continue on more pages */
+  host.innerHTML="";const pages=[];const LV=2;
+  const newPage=cont=>{const p=paperShell(LV);host.append(p);pages.push(p);const z=p.querySelector(".zone");if(cont){const h=document.createElement("div");h.className="p-cont";h.textContent=`Invoice ${B.number}, continued`;z.append(h)}return z};
+  let zone=newPage(false);zone.append(el(B.top),el(B.parties));
+  let tbl=el(B.tableHead);zone.append(tbl);
+  B.rows.forEach(r=>{const tr=el(`<table><tbody>${r}</tbody></table>`).querySelector("tr");tbl.tBodies[0].append(tr);
+    if(over(zone)&&tbl.tBodies[0].rows.length>1){tr.remove();zone=newPage(true);tbl=el(B.tableHead);zone.append(tbl);tbl.tBodies[0].append(tr)}});
+  for(const h of B.after){const n=el(h);zone.append(n);if(over(zone)){n.remove();zone=newPage(true);zone.append(n)}}
   pages.forEach((p,i)=>p.querySelector(".pg").textContent=`Page ${i+1} of ${pages.length}`);
   return pages;
 }
@@ -1565,7 +1594,8 @@ const GMAIL={
   },
   _cb(r){
     const p=this.pending;this.pending=null;if(!p)return;
-    if(r.error){p.rej(new Error(r.error));return}
+    if(r.error){const e=new Error(r.error);e.detail="Google sign-in: "+r.error+(r.error_description?" ("+r.error_description+")":"");p.rej(e);return}
+    if(r.scope&&!/gmail\.send/.test(r.scope)){const e=new Error("noscope");p.rej(e);return}
     this.tok=r.access_token;this.exp=Date.now()+(Number(r.expires_in)||3600)*1000-60000;
     try{sessionStorage.setItem("rv_g_tok",JSON.stringify({t:this.tok,e:this.exp}))}catch{}
     p.res(this.tok);
@@ -1578,16 +1608,29 @@ const GMAIL={
   request(){
     return new Promise((res,rej)=>{
       if(this.valid())return res(this.tok);
-      if(!this.client)return rej(new Error("notready"));
+      if(!this.client){const e=new Error("notready");e.detail="Google sign-in hadn't finished loading";return rej(e)}
       this.pending={res,rej};
       try{this.client.requestAccessToken()}catch(e){this.pending=null;rej(e)}
     });
   },
-  async send(mime){
-    const r=await fetch("https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media",{method:"POST",headers:{Authorization:"Bearer "+this.tok,"Content-Type":"message/rfc822"},body:mime});
+  async _post(url,opts,step){
+    let r;
+    try{r=await fetch(url,{method:"POST",...opts,headers:{Authorization:"Bearer "+this.tok,...opts.headers}})}
+    catch(x){const e=new Error("net");e.detail=`${step}: ${x?.message||x}`;throw e}
     if(r.status===401){this.forgetToken();throw new Error("expired")}
-    if(!r.ok){let t="";try{t=await r.text()}catch{}let j=null;try{j=JSON.parse(t)}catch{}const e=new Error("gmail"+r.status);e.detail=j?.error?.message||t.slice(0,200);throw e}
-    return r.json();
+    if(!r.ok){let t="";try{t=await r.text()}catch{}let j=null;try{j=JSON.parse(t)}catch{}const e=new Error("gmail"+r.status);e.detail=j?.error?.message||t.slice(0,200)||("HTTP "+r.status);throw e}
+    return r.json().catch(()=>({}));
+  },
+  async send(mime){
+    /* route 1: standard JSON send */
+    const raw=b64utf8(mime).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    try{return await this._post("https://gmail.googleapis.com/gmail/v1/users/me/messages/send",{headers:{"Content-Type":"application/json"},body:JSON.stringify({raw})},"Gmail send")}
+    catch(e1){
+      if(e1.message==="expired"||e1.message==="gmail403"||e1.message==="gmail400")throw e1;
+      /* route 2: upload endpoint */
+      try{return await this._post("https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media",{headers:{"Content-Type":"message/rfc822"},body:mime},"Gmail upload")}
+      catch(e2){if(e2.message==="net"&&e1.detail)e2.detail=e1.detail+" · "+e2.detail;throw e2}
+    }
   },
   forgetToken(){this.tok=null;this.exp=0;try{sessionStorage.removeItem("rv_g_tok")}catch{}},
   signOut(){try{if(this.tok&&window.google?.accounts?.oauth2)google.accounts.oauth2.revoke(this.tok,()=>{})}catch{}this.forgetToken()}
@@ -1683,9 +1726,13 @@ async function emailModal(){
           :m==="access_denied"?"Gmail permission wasn't given, so nothing was sent."
           :m==="expired"?"Your Gmail sign-in expired. Press Send again."
           :m==="pdf"?"The PDF couldn't be created, so nothing was sent."
-          :m==="gmail403"?"Gmail refused: "+(x.detail||"permission problem")+". Check that the Gmail API is turned on in your Google Cloud project."
+          :m==="noscope"?"Google signed you in, but the box \u201cSend email on your behalf\u201d wasn't ticked. Press Send again and tick it."
+          :m==="gmail403"?"Gmail refused: "+(x.detail||"permission problem")+(/not been used|disabled/i.test(x.detail||"")?" Turn on the Gmail API in your Google Cloud project, wait a few minutes, then try again.":/scope/i.test(x.detail||"")?" Press Send again and tick \u201cSend email on your behalf\u201d.":"")
           :m.startsWith("gmail")?"Gmail couldn't send it: "+(x.detail||m)
-          :"Nothing was sent. Check your internet and try again.");
+          :m==="net"?"Couldn't reach Gmail. If you use an ad blocker or privacy extension, allow this page and try again. Details: "+(x.detail||"")
+          :"Nothing was sent. Details: "+(x?.detail||x?.message||String(x)));
+        if(m==="noscope")GMAIL.forgetToken();
+        console.error("Email send failed",x);
         const b=$("#m_send");if(b){b.disabled=false;b.innerHTML=`${icon("mail")}Send invoice`}
       }
     })();
@@ -1697,9 +1744,10 @@ function renderGmailSetup(box,onDone){
     <div style="color:var(--muted);margin:4px 0 8px">Paste the <b>Client ID</b> from your Google Cloud project. Under <b>Authorized JavaScript origins</b> there, add this address:</div>
     <div class="uri" style="margin:0 0 8px"><code id="gOrigin">${esc(location.origin)}</code><button type="button" class="btn sm" id="gOcopy">${icon("copy")}Copy</button></div>
     <div class="row" style="flex-wrap:nowrap"><input class="inp" id="gCid" placeholder="…apps.googleusercontent.com" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(LS.get("rv_g_cid")||"")}"><button type="button" class="btn primary" id="gCsave">Save</button></div>
+    ${GMAIL.cid()?`<div class="hint" style="margin-top:6px">Saved now: <code style="word-break:break-all">${esc(GMAIL.cid())}</code></div>`:""}
     <div class="err" id="gCerr" hidden></div></div>`;
   box.querySelector("#gOcopy").onclick=async()=>{try{await navigator.clipboard.writeText(location.origin);toast("Address copied")}catch{toast("Press and hold the address to copy it")}};
-  box.querySelector("#gCsave").onclick=()=>{const v=box.querySelector("#gCid").value.trim();
+  box.querySelector("#gCsave").onclick=()=>{const v=box.querySelector("#gCid").value.replace(/\s+/g,"").replace(/^["'<]+|["'>.,;]+$/g,"");
     if(!/^[\w-]+\.apps\.googleusercontent\.com$/.test(v)){const e=box.querySelector("#gCerr");e.hidden=false;e.textContent="That isn't a Client ID. It ends in .apps.googleusercontent.com";return}
     LS.set("rv_g_cid",v);GMAIL.client=null;GMAIL.forgetToken();toast("Gmail connection saved");onDone&&onDone()};
 }
